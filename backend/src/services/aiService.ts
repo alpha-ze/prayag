@@ -35,7 +35,10 @@ export class AIService {
 
   async generateImage(prompt: string): Promise<string> {
     try {
-      const response = await getOpenAI().images.generate({
+      const openaiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY;
+      if (!openaiKey) throw new Error('No OpenAI API key configured');
+      const openai = new OpenAI({ apiKey: openaiKey });
+      const response = await openai.images.generate({
         model: "dall-e-3",
         prompt: prompt,
         size: "1024x1024",

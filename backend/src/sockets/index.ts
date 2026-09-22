@@ -83,46 +83,43 @@ export function setupSocketHandlers(io: SocketIOServer) {
     }
   });
 
-  io.on('connection', (socket: AuthenticatedSocket) => {
-    console.log(`User ${socket.user.username} connected`);
+  io.on('connection', (socket: any) => {
+    const s = socket as AuthenticatedSocket;
+    console.log(`User ${s.user.username} connected`);
 
     // Join user to their personal room
-    socket.join(`user:${socket.user.id}`);
+    s.join(`user:${s.user.id}`);
 
     // Join appropriate role-based rooms
-    if (socket.user.role === 'admin') {
-      socket.join('admins');
+    if (s.user.role === 'admin') {
+      s.join('admins');
     } else {
-      socket.join('participants');
+      s.join('participants');
     }
 
     // Handle joining game rooms
-    socket.on('join_game', (data: { gameType: 'promptle' | 'survival'; sessionId: string }) => {
+    s.on('join_game', (data: { gameType: 'promptle' | 'survival'; sessionId: string }) => {
       const roomName = `${data.gameType}:${data.sessionId}`;
-      socket.join(roomName);
-      console.log(`User ${socket.user.username} joined ${roomName}`);
+      s.join(roomName);
+      console.log(`User ${s.user.username} joined ${roomName}`);
     });
 
     // Handle leaving game rooms
-    socket.on('leave_game', (data: { gameType: 'promptle' | 'survival'; sessionId: string }) => {
+    s.on('leave_game', (data: { gameType: 'promptle' | 'survival'; sessionId: string }) => {
       const roomName = `${data.gameType}:${data.sessionId}`;
-      socket.leave(roomName);
-      console.log(`User ${socket.user.username} left ${roomName}`);
+      s.leave(roomName);
+      console.log(`User ${s.user.username} left ${roomName}`);
     });
 
     // Handle real-time game events
-    socket.on('game_action', (data: { type: string; payload: any }) => {
-      // Broadcast game actions to relevant rooms
-      // This would be integrated with the game engines
-      console.log(`Game action from ${socket.user.username}:`, data);
+    s.on('game_action', (data: { type: string; payload: any }) => {
+      console.log(`Game action from ${s.user.username}:`, data);
     });
 
     // Handle admin events (if admin)
-    if (socket.user.role === 'admin') {
-      socket.on('admin_action', (data: { type: string; payload: any }) => {
-        console.log(`Admin action from ${socket.user.username}:`, data);
-        
-        // Broadcast to all participants or specific groups
+    if (s.user.role === 'admin') {
+      s.on('admin_action', (data: { type: string; payload: any }) => {
+        console.log(`Admin action from ${s.user.username}:`, data);
         switch (data.type) {
           case 'round_start':
             io.to('participants').emit('round_started', data.payload);
@@ -142,9 +139,8 @@ export function setupSocketHandlers(io: SocketIOServer) {
       });
 
       // Round control from admin panel
-      socket.on('round_control', (data: { action: 'start' | 'pause' | 'end' | 'reset'; type?: 'promptle' | 'survival' }) => {
-        console.log(`Round control from ${socket.user.username}:`, data);
-
+      s.on('round_control', (data: { action: 'start' | 'pause' | 'end' | 'reset'; type?: 'promptle' | 'survival' }) => {
+        console.log(`Round control from ${s.user.username}:`, data);
         switch (data.action) {
           case 'start':
             roundState.status = 'active';
@@ -178,14 +174,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
     }
 
     // Handle disconnection
-    socket.on('disconnect', () => {
-      console.log(`User ${socket.user.username} disconnected`);
+    s.on('disconnect', () => {
+      console.log(`User ${s.user.username} disconnected`);
     });
 
     // Send welcome message
-    socket.emit('connected', {
+    s.emit('connected', {
       message: 'Connected to PROMPT X',
-      user: socket.user,
+      user: s.user,
     });
   });
 

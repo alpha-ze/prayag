@@ -10,27 +10,48 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
+    "declaration": false,
     "sourceMap": true,
     "removeComments": true,
     "noImplicitAny": false,
     "strictNullChecks": false,
     "noImplicitReturns": false,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": false,
     "moduleResolution": "node",
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/index.ts",
+    "src/controllers/**/*",
+    "src/routes/**/*",
+    "src/services/aiService.ts",
+    "src/services/dbService.ts",
+    "src/sockets/**/*",
+    "src/utils/**/*",
+    "src/types/**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist",
     "**/*.test.ts",
+    "src/database/connection-local.ts",
+    "src/database/migrate-local.ts",
+    "src/database/seed-local.ts",
+    "src/database/migrate.ts",
+    "src/database/seed.ts",
+    "src/database/reset.ts",
+    "src/database/seed-game-data.ts",
+    "src/database/setup-tables.ts",
+    "src/database/migrate-game-tables.ts",
+    "src/database/create-demo-users.ts",
     "src/services/authService.ts",
     "src/services/challengeService.ts",
-    "src/services/scenarioService.ts"
+    "src/services/scenarioService.ts",
+    "src/game/survival/survivalEngine.ts",
+    "src/game/promptle/promptleEngine.ts",
+    "src/index-local.ts"
   ]
 }
