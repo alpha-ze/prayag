@@ -8,7 +8,6 @@
     "dev:local": "NODE_ENV=development tsx watch src/index-local.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "postbuild": "npm run db:migrate && npm run db:seed",
     "test": "jest",
     "test:watch": "jest --watch",
     "db:migrate": "tsx src/database/migrate.ts",
