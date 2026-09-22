@@ -224,6 +224,7 @@ const SurvivalGame: React.FC = () => {
   }
 
   const maxHealth = currentSurvivalSession?.maxHealth ?? 5;
+  const sessionAny = currentSurvivalSession as any;
   const healthPct = maxHealth > 0 ? (displayHealth / maxHealth) * 100 : 0;
   const isLowHealth = healthPct <= 40;
   const isCriticalHealth = healthPct <= 20;
@@ -342,7 +343,7 @@ const SurvivalGame: React.FC = () => {
           <h1 className="text-3xl font-bold font-cyber bg-gradient-to-r from-neon-pink to-neon-green bg-clip-text text-transparent mb-1">
             PROMPT X — SURVIVE
           </h1>
-          <p className="text-gray-400">{currentSurvivalSession?.scenario?.title || 'Desert Survival'}</p>
+          <p className="text-gray-400">{sessionAny?.scenario?.title || 'Desert Survival'}</p>
         </motion.div>
 
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -466,19 +467,19 @@ const SurvivalGame: React.FC = () => {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-dark-200 rounded-2xl border border-gray-600 overflow-hidden">
               <div className="bg-gradient-to-r from-neon-pink/20 to-neon-green/20 px-6 py-4 border-b border-gray-600 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-white">
-                  📍 {currentSurvivalSession?.scenario?.title || 'Desert Survival'}
+                  📍 {sessionAny?.scenario?.title || 'Desert Survival'}
                 </h2>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                  currentSurvivalSession?.scenario?.difficulty === 'hard' ? 'bg-red-500/20 text-red-400' :
-                  currentSurvivalSession?.scenario?.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
+                  sessionAny?.scenario?.difficulty === 'hard' ? 'bg-red-500/20 text-red-400' :
+                  sessionAny?.scenario?.difficulty === 'easy' ? 'bg-green-500/20 text-green-400' :
                   'bg-yellow-500/20 text-yellow-400'
                 }`}>
-                  {currentSurvivalSession?.scenario?.difficulty || 'medium'}
+                  {sessionAny?.scenario?.difficulty || 'medium'}
                 </span>
               </div>
               <div className="p-5 space-y-4">
                 <p className="text-gray-300 leading-relaxed">
-                  {currentSurvivalSession?.scenario?.description || 'You are stranded. Survive and reach safety.'}
+                  {sessionAny?.scenario?.description || 'You are stranded. Survive and reach safety.'}
                 </p>
                 <div className="bg-neon-blue/10 border border-neon-blue/20 rounded-xl p-4">
                   <h3 className="text-neon-blue font-semibold mb-2 text-sm">💡 How to Play</h3>

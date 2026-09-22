@@ -142,7 +142,7 @@ const PromptelGame: React.FC = () => {
     }
 
     try {
-      const hint = await usePromptelHint();
+      const { hint } = await usePromptelHint();
       setShowHint(hint);
     } catch (error) {
       console.error('Failed to use hint:', error);
