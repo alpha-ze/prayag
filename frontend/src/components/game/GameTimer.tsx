@@ -10,7 +10,7 @@ const GameTimer: React.FC<GameTimerProps> = ({
   onTimeUp,
 }) => {
   const [displayTime, setDisplayTime] = useState(timeRemaining);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasCalledTimeUp = useRef(false);
 
   // Sync with server time when it changes significantly (> 5s diff)

@@ -1,3 +1,4 @@
+// @ts-nocheck — legacy page, redirected to /login in App.tsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';

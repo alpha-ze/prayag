@@ -40,8 +40,8 @@ const QualifyScreen: React.FC = () => {
 
       // Sort by promptle score desc, then time taken asc (lower = faster)
       const sorted = [...data].sort((a, b) => {
-        const aScore = (a.roundScores as any)?.promptle ?? a.totalScore ?? 0;
-        const bScore = (b.roundScores as any)?.promptle ?? b.totalScore ?? 0;
+        const aScore = (a as any)?.roundScores?.promptle ?? a.totalScore ?? 0;
+        const bScore = (b as any)?.roundScores?.promptle ?? b.totalScore ?? 0;
         if (bScore !== aScore) return bScore - aScore;
         // tiebreak: faster time (lower) wins
         const aTime = (a as any).timeTaken ?? 99999;

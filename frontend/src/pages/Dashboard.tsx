@@ -32,7 +32,7 @@ const Dashboard: React.FC = () => {
       const totalPlayers = entries.length;
       const activeGames = entries.filter((e) => e.status === 'active').length;
       const completedChallenges = entries.filter(
-        (e) => e.status === 'survived' || e.status === 'completed' || e.status === 'dead' || e.status === 'turn_limit'
+        (e) => ['survived', 'completed', 'dead', 'turn_limit'].includes(e.status as string)
       ).length;
       const averageScore =
         totalPlayers > 0
