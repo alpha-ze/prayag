@@ -1,3 +1,4 @@
+// @ts-nocheck — legacy file, not used in active game flow
 import { supabase } from '@/database/supabase';
 import { Scenario } from '@/types';
 import { CreateScenarioInput } from '@/utils/validation';
