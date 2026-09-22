@@ -7,7 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "dev:local": "NODE_ENV=development tsx watch src/index-local.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "TS_NODE_BASEURL=./dist node -r tsconfig-paths/register dist/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "db:migrate": "tsx src/database/migrate.ts",
@@ -32,6 +32,7 @@
     "openai": "^4.20.1",
     "pg": "^8.11.3",
     "socket.io": "^4.7.4",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^9.0.1",
     "ws": "^8.21.3",
     "zod": "^3.22.4"
