@@ -1,0 +1,28 @@
+{
+  "name": "prompt-x",
+  "version": "1.0.0",
+  "description": "AI Competition Platform - PROMPT X",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "dev:local": "concurrently \"cd backend && npm run dev:local\" \"cd frontend && npm run dev\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:backend:local": "cd backend && npm run dev:local",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "start": "cd backend && npm start",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd frontend && npm run test",
+    "test:backend": "cd backend && npm run test",
+    "setup": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "setup:supabase": "npm run setup && cd backend && npm run db:migrate && npm run db:seed",
+    "setup:local": "npm run setup && cd backend && npm run setup:local",
+    "db:migrate": "cd backend && npm run db:migrate",
+    "db:seed": "cd backend && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

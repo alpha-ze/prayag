@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  
+  body {
+    @apply bg-dark-400 text-white antialiased;
+    overflow-x: hidden;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  /* Custom scrollbar styles */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thumb-gray-600 {
+    scrollbar-color: #4b5563 transparent;
+  }
+  
+  .scrollbar-track-gray-800 {
+    scrollbar-color: #1f2937 transparent;
+  }
+  
+  /* Webkit scrollbar styles */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+    background-color: #4b5563;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-track-gray-800::-webkit-scrollbar-track {
+    background-color: #1f2937;
+  }
+  
+  /* Cyber grid background */
+  .cyber-grid-bg {
+    background-image: 
+      linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  /* Neon glow effects */
+  .glow-blue {
+    box-shadow: 
+      0 0 5px theme('colors.neon-blue'),
+      0 0 10px theme('colors.neon-blue'),
+      0 0 15px theme('colors.neon-blue');
+  }
+  
+  .glow-purple {
+    box-shadow: 
+      0 0 5px theme('colors.neon-purple'),
+      0 0 10px theme('colors.neon-purple'),
+      0 0 15px theme('colors.neon-purple');
+  }
+  
+  .glow-green {
+    box-shadow: 
+      0 0 5px theme('colors.neon-green'),
+      0 0 10px theme('colors.neon-green'),
+      0 0 15px theme('colors.neon-green');
+  }
+  
+  .glow-pink {
+    box-shadow: 
+      0 0 5px theme('colors.neon-pink'),
+      0 0 10px theme('colors.neon-pink'),
+      0 0 15px theme('colors.neon-pink');
+  }
+  
+  /* Text glow effects */
+  .text-glow-blue {
+    text-shadow: 
+      0 0 5px theme('colors.neon-blue'),
+      0 0 10px theme('colors.neon-blue'),
+      0 0 15px theme('colors.neon-blue');
+  }
+  
+  .text-glow-purple {
+    text-shadow: 
+      0 0 5px theme('colors.neon-purple'),
+      0 0 10px theme('colors.neon-purple'),
+      0 0 15px theme('colors.neon-purple');
+  }
+  
+  .text-glow-green {
+    text-shadow: 
+      0 0 5px theme('colors.neon-green'),
+      0 0 10px theme('colors.neon-green'),
+      0 0 15px theme('colors.neon-green');
+  }
+  
+  .text-glow-pink {
+    text-shadow: 
+      0 0 5px theme('colors.neon-pink'),
+      0 0 10px theme('colors.neon-pink'),
+      0 0 15px theme('colors.neon-pink');
+  }
+}

@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: prompt-x-backend
+    runtime: node
+    plan: starter
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: promptx-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: AI_API_KEY
+        sync: false  # You'll set this manually in Render dashboard
+      - key: IMAGE_GENERATION_API_KEY
+        sync: false  # You'll set this manually in Render dashboard
+
+databases:
+  - name: promptx-db
+    databaseName: promptx
+    plan: starter
