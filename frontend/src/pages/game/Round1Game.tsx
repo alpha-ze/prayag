@@ -26,12 +26,12 @@ import GameTimer from '@/components/game/GameTimer';
 const CHALLENGE_META: Record<string, { title: string; imageUrl: string; imageNum: number }> = {
   [CHALLENGE_1_ID]: {
     title: 'Image 1 — Space Explorer',
-    imageUrl: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1024&h=1024&fit=crop',
+    imageUrl: '/images/space-explorer.png',
     imageNum: 1,
   },
   [CHALLENGE_2_ID]: {
     title: 'Image 2 — Ocean Deep',
-    imageUrl: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1024&h=1024&fit=crop',
+    imageUrl: '/images/ocean-deep.png',
     imageNum: 2,
   },
 };
