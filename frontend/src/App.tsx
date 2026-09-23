@@ -31,6 +31,7 @@ function CompetitionRouter() {
   switch (phase) {
     case 'round1_img1':
     case 'round1_img2':
+    case 'round1_img3':
       return <Navigate to="/game/round1" replace />;
     case 'qualifying':
       return <Navigate to="/game/qualify" replace />;
