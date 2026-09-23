@@ -11,6 +11,11 @@ function getAIClient(): { client: any; model: string; provider: 'groq' | 'openai
   // Check if Groq keys exist WITHOUT consuming/rotating the key index
   const groqKeyCount = getGroqKeyCount();
 
+  // Debug: log what env vars are set
+  console.log(`🔧 ENV check — GROQ_API_KEYS: ${process.env.GROQ_API_KEYS ? process.env.GROQ_API_KEYS.substring(0, 20) + '...' : 'NOT SET'}`);
+  console.log(`🔧 ENV check — GROQ_API_KEY: ${process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 15) + '...' : 'NOT SET'}`);
+  console.log(`🔧 Key count: ${groqKeyCount}`);
+
   if (groqKeyCount > 0) {
     console.log(`🔑 AI provider: groq / model: llama-3.3-70b-versatile (${groqKeyCount} key(s))`);
     return { client: null, model: 'llama-3.3-70b-versatile', provider: 'groq' };
