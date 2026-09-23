@@ -15,7 +15,7 @@ class AIRequestQueue {
   private activeRequests = 0;
   private readonly maxConcurrent = 12;     // 4 keys × ~3 concurrent each
   private readonly maxQueueSize = 150;      // covers all 70 students with buffer
-  private readonly timeoutMs = 30000;       // 30s timeout per request
+  private readonly timeoutMs = 45000;       // 45s — llama-3.3-70b needs more time
   private processedCount = 0;
 
   async enqueue<T>(task: () => Promise<T>): Promise<T> {

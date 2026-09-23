@@ -31,7 +31,7 @@ function getAIClient(): { client: any; model: string; provider: 'groq' | 'openai
 
 export class AIService {
   private readonly maxRetries = 2;
-  private readonly timeout = 15000; // 15 seconds
+  private readonly timeout = 40000; // 40 seconds for llama-3.3-70b
 
   async generateImage(prompt: string): Promise<string> {
     try {
@@ -99,73 +99,36 @@ export class AIService {
   }
 
   private async callOpenAI(systemPrompt: string, userPrompt: string): Promise<any> {
-    const { client, model, provider } = getAIClient();
+    const { model, provider } = getAIClient();
     console.log(`🤖 Using AI provider: ${provider} / model: ${model}`);
 
-    // For Groq: use Node's https module directly (most reliable in this environment)
+    const messages = [
+      { role: 'system' as const, content: systemPrompt },
+      { role: 'user' as const, content: userPrompt },
+    ];
+
     if (provider === 'groq') {
+      // Use the Groq SDK directly — clean, handles retries, correct key rotation
       const key = getNextGroqKey();
-      return new Promise((resolve, reject) => {
-        const https = require('https');
-        const payload = JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          max_tokens: 800,
-          temperature: 0.9,
-        });
-
-        const options = {
-          hostname: 'api.groq.com',
-          path: '/openai/v1/chat/completions',
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${key}`,
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(payload),
-          },
-          timeout: 12000,
-        };
-
-        const req = https.request(options, (res: any) => {
-          let data = '';
-          res.on('data', (chunk: any) => { data += chunk; });
-          res.on('end', () => {
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.error) {
-                reject(new Error(`Groq error: ${JSON.stringify(parsed.error)}`));
-              } else {
-                resolve(parsed);
-              }
-            } catch (e) {
-              reject(new Error(`Failed to parse Groq response: ${data.substring(0, 200)}`));
-            }
-          });
-        });
-
-        req.on('timeout', () => {
-          req.destroy();
-          reject(new Error('Groq request timed out'));
-        });
-
-        req.on('error', (err: any) => reject(err));
-        req.write(payload);
-        req.end();
+      const groq = new Groq({ apiKey: key });
+      const response = await groq.chat.completions.create({
+        model,
+        messages,
+        max_tokens: 800,
+        temperature: 0.9,
       });
+      return response;
     }
 
-    // For OpenAI: use the SDK
-    return client.chat.completions.create({
+    // OpenAI fallback
+    const openaiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY;
+    if (!openaiKey) throw new Error('No OpenAI API key configured');
+    if (!openaiInstance) openaiInstance = new OpenAI({ apiKey: openaiKey });
+    return openaiInstance.chat.completions.create({
       model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
+      messages,
       temperature: 0.9,
-      max_tokens: 600,
+      max_tokens: 800,
     });
   }
 
