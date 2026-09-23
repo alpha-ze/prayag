@@ -113,34 +113,48 @@ const Round2Game: React.FC = () => {
       });
 
       if (res.isGameOver) {
-        // All 5 scenarios done (or 0 lives left)
         setGameComplete(true);
-        setTimeout(() => {
-          setResult(null);
-          clearSurvivalSession();
-          resetSurvivalSession();
-          const finalScore = (currentSurvivalSession as any)?.score ?? 0;
-          setRound2Score(finalScore);
-          advancePhase('final');
-          navigate('/game/final');
-        }, 6000);
-      } else if (survived) {
-        // Show triumph briefly, then transition to next scenario
-        setTimeout(() => {
-          setResult(null);
-          setTransitioning(true);
-          setTimeout(() => setTransitioning(false), 2500);
-        }, 4000);
-      } else {
-        // Died — show death screen, then auto-advance to next scenario
-        setTimeout(() => {
-          setResult(null);
-          setTransitioning(true);
-          setTimeout(() => setTransitioning(false), 2000);
-        }, 5000);
+        // Game over — wait for keypress to go to final leaderboard
       }
+      // For both survived and died (non-game-over):
+      // The overlay stays until the player presses any key or taps
     } catch {/* ignore */}
   };
+
+  // Dismiss the result overlay on any key press or tap
+  const dismissResult = () => {
+    if (!result) return;
+
+    if (gameComplete) {
+      setResult(null);
+      clearSurvivalSession();
+      resetSurvivalSession();
+      const finalScore = (currentSurvivalSession as any)?.score ?? 0;
+      setRound2Score(finalScore);
+      advancePhase('final');
+      navigate('/game/final');
+      return;
+    }
+
+    // Not game over — advance to next scenario
+    setResult(null);
+    setTransitioning(true);
+    setTimeout(() => {
+      setTransitioning(false);
+    }, 2000);
+  };
+
+  // Listen for any key press to dismiss the overlay
+  React.useEffect(() => {
+    if (!result) return;
+    const handler = (e: KeyboardEvent) => {
+      // Ignore modifier-only keys
+      if (['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
+      dismissResult();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [result, gameComplete]);
 
   const handleTimeUp = () => {
     clearSurvivalSession();
@@ -177,7 +191,8 @@ const Round2Game: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md cursor-pointer"
+            onClick={dismissResult}
           >
             <motion.div
               initial={{ scale: 0.6, y: 50 }}
@@ -235,16 +250,14 @@ const Round2Game: React.FC = () => {
                 </p>
               )}
 
-              {/* Progress indicator */}
+              {/* Press any key hint */}
               {!gameComplete && (
                 <motion.p
                   animate={{ opacity: [0.4, 1, 0.4] }}
                   transition={{ repeat: Infinity, duration: 1.5 }}
-                  className="text-center text-gray-500 text-sm mt-5"
+                  className="text-center text-gray-400 text-sm mt-5 font-semibold"
                 >
-                  {result.survived
-                    ? scenarioIndex < 4 ? `Moving to Scenario ${scenarioIndex + 2}…` : 'All scenarios complete!'
-                    : livesLeft > 1 ? `${livesLeft - 1} lives remaining — next scenario…` : 'Last life gone…'}
+                  Press any key or tap to continue →
                 </motion.p>
               )}
               {gameComplete && (
@@ -253,7 +266,7 @@ const Round2Game: React.FC = () => {
                   transition={{ repeat: Infinity, duration: 1.5 }}
                   className="text-center text-yellow-400 text-sm mt-5 font-semibold flex items-center justify-center gap-2"
                 >
-                  <Crown className="w-4 h-4" /> Loading final leaderboard…
+                  <Crown className="w-4 h-4" /> Press any key to view final leaderboard
                 </motion.p>
               )}
             </motion.div>
