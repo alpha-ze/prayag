@@ -18,7 +18,7 @@ function getAIClient(): { client: any; model: string; provider: 'groq' | 'openai
 
   if (groqKeyCount > 0) {
     console.log(`🔑 AI provider: groq / model: llama-3.3-70b-versatile (${groqKeyCount} key(s))`);
-    return { client: null, model: 'llama-3.3-70b-versatile', provider: 'groq' };
+    return { client: null, model: 'llama3-70b-8192', provider: 'groq' };
   }
 
   const openaiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY;
