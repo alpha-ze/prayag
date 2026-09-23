@@ -14,7 +14,7 @@ function getAIClient(): { client: any; model: string; provider: 'groq' | 'openai
     // Always create fresh Groq instance with the rotated key
     const groqInstance = new Groq({ apiKey: groqKey });
     console.log(`🔑 AI Keys - GROQ: ${groqKey.substring(0, 15)}... (${getGroqKeyCount()} key(s) available), OpenAI: SET`);
-    return { client: groqInstance, model: 'allam-2-7b', provider: 'groq' };
+    return { client: groqInstance, model: 'llama-3.3-70b-versatile', provider: 'groq' };
   }
 
   const openaiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY;
@@ -113,7 +113,7 @@ export class AIService {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
           ],
-          max_tokens: 600,
+          max_tokens: 800,
           temperature: 0.9,
         });
 
