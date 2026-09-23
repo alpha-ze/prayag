@@ -167,7 +167,10 @@ export class SurvivalController {
       };
 
       sessionStore.set(sessionId, 'survival', sessionData);
-      if (user.id !== 'anonymous-user') {
+
+      // Only persist to Supabase if scenario_id is a valid UUID
+      const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(scenario.id);
+      if (user.id !== 'anonymous-user' && isValidUUID) {
         saveSurvivalSession({
           id: sessionId,
           user_id: user.id,

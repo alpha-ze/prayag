@@ -74,12 +74,14 @@ export const aiQueue = new AIRequestQueue();
 
 function loadGroqKeys(): string[] {
   // Prefer GROQ_API_KEYS (comma-separated list), fall back to single GROQ_API_KEY
-  const multiKey = process.env.GROQ_API_KEYS || '';
+  const multiKey = (process.env.GROQ_API_KEYS || '').trim();
   if (multiKey) {
-    const keys = multiKey.split(',').map(k => k.trim()).filter(k => k.startsWith('gsk_'));
+    const keys = multiKey.split(',')
+      .map(k => k.trim().replace(/[\r\n\t]/g, ''))  // strip any invisible chars
+      .filter(k => k.startsWith('gsk_'));
     if (keys.length > 0) return keys;
   }
-  const single = process.env.GROQ_API_KEY;
+  const single = (process.env.GROQ_API_KEY || '').trim().replace(/[\r\n\t]/g, '');
   if (single && single.startsWith('gsk_')) return [single];
   return [];
 }
