@@ -8,17 +8,16 @@ let openaiInstance: OpenAI | null = null;
 
 // Use Groq if GROQ_API_KEY is set (free), otherwise fall back to OpenAI
 function getAIClient(): { client: any; model: string; provider: 'groq' | 'openai' } {
-  const groqKey = getNextGroqKey();
+  // Check if Groq keys exist WITHOUT consuming/rotating the key index
+  const groqKeyCount = getGroqKeyCount();
 
-  if (groqKey) {
-    // Always create fresh Groq instance with the rotated key
-    const groqInstance = new Groq({ apiKey: groqKey });
-    console.log(`🔑 AI Keys - GROQ: ${groqKey.substring(0, 15)}... (${getGroqKeyCount()} key(s) available), OpenAI: SET`);
-    return { client: groqInstance, model: 'llama-3.3-70b-versatile', provider: 'groq' };
+  if (groqKeyCount > 0) {
+    console.log(`🔑 AI provider: groq / model: llama-3.3-70b-versatile (${groqKeyCount} key(s))`);
+    return { client: null, model: 'llama-3.3-70b-versatile', provider: 'groq' };
   }
 
   const openaiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY;
-  console.log(`🔑 AI Keys - GROQ: NOT SET, OpenAI: ${openaiKey ? 'SET' : 'NOT SET'}`);
+  console.log(`🔑 AI provider: openai / key: ${openaiKey ? 'SET' : 'NOT SET'}`);
 
   if (openaiKey) {
     if (!openaiInstance) openaiInstance = new OpenAI({ apiKey: openaiKey });
@@ -108,16 +107,62 @@ export class AIService {
     ];
 
     if (provider === 'groq') {
-      // Use the Groq SDK directly — clean, handles retries, correct key rotation
+      // Get ONE key for this request (don't call getNextGroqKey twice)
       const key = getNextGroqKey();
-      const groq = new Groq({ apiKey: key });
-      const response = await groq.chat.completions.create({
-        model,
-        messages,
-        max_tokens: 800,
-        temperature: 0.9,
+      console.log(`🔑 Using Groq key: ${key.substring(0, 15)}...`);
+
+      return new Promise((resolve, reject) => {
+        const https = require('https');
+        const payload = JSON.stringify({
+          model,
+          messages,
+          max_tokens: 800,
+          temperature: 0.9,
+        });
+
+        const options = {
+          hostname: 'api.groq.com',
+          path: '/openai/v1/chat/completions',
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload),
+          },
+          timeout: 35000,
+        };
+
+        const req = https.request(options, (res: any) => {
+          let data = '';
+          res.on('data', (chunk: any) => { data += chunk; });
+          res.on('end', () => {
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.error) {
+                console.error('Groq API error:', JSON.stringify(parsed.error));
+                reject(new Error(`Groq error: ${JSON.stringify(parsed.error)}`));
+              } else {
+                resolve(parsed);
+              }
+            } catch (e) {
+              reject(new Error(`Failed to parse Groq response: ${data.substring(0, 300)}`));
+            }
+          });
+        });
+
+        req.on('timeout', () => {
+          req.destroy();
+          reject(new Error('Groq request timed out after 35s'));
+        });
+
+        req.on('error', (err: any) => {
+          console.error('Groq request error:', err.message);
+          reject(err);
+        });
+
+        req.write(payload);
+        req.end();
       });
-      return response;
     }
 
     // OpenAI fallback
