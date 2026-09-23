@@ -120,13 +120,11 @@ app.get('/health', (req, res) => {
 
 app.get('/api/health/ai', (req, res) => {
   const keyCount = getGroqKeyCount();
-  // Show masked versions of all keys so you can verify rotation
   const keys = (process.env.GROQ_API_KEYS || process.env.GROQ_API_KEY || '')
     .split(',')
     .map(k => k.trim().replace(/[\r\n\t]/g, ''))
     .filter(k => k.startsWith('gsk_'))
     .map((k, i) => `key${i + 1}: ${k.substring(0, 15)}...${k.slice(-4)}`);
-
   res.json({
     status: keyCount > 0 ? 'OK' : 'NO_KEYS',
     keyCount,
@@ -135,6 +133,8 @@ app.get('/api/health/ai', (req, res) => {
     source: process.env.GROQ_API_KEYS ? 'GROQ_API_KEYS' : 'GROQ_API_KEY',
   });
 });
+
+app.get('/api/health/db', async (req, res) => {
   try {
     const isConnected = await testSupabaseConnection();
     res.json({ 
