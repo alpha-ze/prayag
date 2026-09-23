@@ -15,6 +15,7 @@ import Login      from './pages/Login';
 import Dashboard  from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
 import AdminPanel  from './pages/admin/AdminPanel';
+import LiveLeaderboard from './pages/LiveLeaderboard';
 
 // Layout
 import Layout         from './components/Layout';
@@ -65,6 +66,8 @@ function App() {
             }
           />
           <Route path="/register" element={<Navigate to="/login" replace />} />
+          {/* Live leaderboard — public, no auth needed, for projector display */}
+          <Route path="/live" element={<LiveLeaderboard />} />
 
           {/* Protected competition flow — no Layout chrome, fullscreen */}
           <Route element={<ProtectedRoute />}>
