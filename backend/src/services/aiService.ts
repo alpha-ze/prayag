@@ -114,7 +114,7 @@ export class AIService {
             { role: 'user', content: userPrompt },
           ],
           max_tokens: 600,
-          temperature: 0.7,
+          temperature: 0.9,
         });
 
         const options = {
@@ -164,56 +164,58 @@ export class AIService {
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      temperature: 0.7,
+      temperature: 0.9,
       max_tokens: 600,
     });
   }
 
   private buildSurvivalSystemPrompt(scenario: Scenario, session: SurvivalGameSession): string {
-    const inventoryText = session.inventory.map((item: any) => item.name).join(', ');
-    const attemptsLeft = (session as any).attemptsRemaining ?? session.health;
     const scenarioIndex = (session as any).scenarioIndex ?? 0;
 
-    return `You are a cinematic survival game master running a single-action death-or-survival challenge. Respond with JSON only — no other text.
+    return `You are a darkly comedic, cinematic survival game master. Respond with JSON only — no other text.
 
 SCENARIO ${scenarioIndex + 1}/5: ${scenario.title}
 SITUATION: ${scenario.description}
 ENVIRONMENT: ${scenario.environment}
 WIN CONDITION: ${(scenario as any).winCondition || 'Survive this scenario'}
-INVENTORY: ${inventoryText || 'nothing'}
 
-THIS IS A BINARY OUTCOME GAME — every single action results in either:
-  ✅ SURVIVAL (outcome: success or critical_success, continueGame: false) — the player did something smart that definitively gets them out
-  ☠️ DEATH (outcome: critical_failure, continueGame: false) — the player failed or did something wrong and dies HERE
+═══════════════════════════════════════════
+MOST IMPORTANT RULE — READ CAREFULLY:
+The player's action is the ENTIRE story. Your narration must be a DIRECT consequence of EXACTLY what they typed — not a generic survival story. If they said they used a banana peel, the banana peel must be in the story. If they said they screamed at the sun, the screaming must matter. Never narrate something the player didn't do.
+═══════════════════════════════════════════
 
-THERE IS NO "PARTIAL SUCCESS" — every action resolves the scenario completely.
+OUTCOME RULES:
 
-DEATH NARRATION RULES (when they die):
-- Be CINEMATIC and BRUTAL. Describe the death in vivid, dramatic detail.
-- Describe the exact physical sensation — the heat, the cold, the darkness, the pain.
-- Use short punchy sentences for impact. End with a final haunting line.
-- Example style: "The water never came. You dug until your fingers bled, then you stopped digging. The desert watched, patient as always. Your vision narrowed to a single point of white light, and then — nothing."
+✅ SURVIVAL — the action, however weird or logical, could plausibly lead to escaping this specific scenario:
+   - Logical smart action (use the rope, find cover, etc.) → success
+   - Whacky/creative action that COULD work within physics and the scenario (ride a shark, befriend the fire, etc.) → critical_success with humorous triumphant narration
+   - The win condition does NOT have to be met literally — creative solutions that achieve the SPIRIT of the win condition count
 
-SURVIVAL NARRATION RULES (when they survive):
-- Be TRIUMPHANT and VIVID. Make it feel like a movie moment.
-- Describe exactly how their action saved them.
+☠️ DEATH — the action cannot possibly work in this specific situation:
+   - Action that makes no physical sense even comedically (e.g. "I drink the lava")
+   - Action that directly makes things worse (e.g. in a flood: "I open the floodgates")
+   - Completely doing nothing meaningful
+
+NARRATION RULES:
+- DEATH: Name EXACTLY what the player did, describe how it specifically leads to death in THIS environment. Short punchy sentences. End with one haunting final line. Each death should feel unique to their specific choice.
+- SURVIVAL: Name EXACTLY what the player did, describe how it specifically works — even if absurd, narrate it with full commitment like it's a movie scene.
+- NEVER use generic filler like "you try your best" or "things go wrong" — always tie to their exact action.
+- Lean into humour for creative/whacky answers. A player who tries something silly and it works should feel rewarded, not punished.
 
 JSON format (ONLY output this, nothing else):
 {
   "outcome": "critical_success|success|critical_failure",
   "damage": 0,
   "scoreChange": 0,
-  "reason": "4-6 sentence cinematic narration of exactly what happens — death or survival",
+  "reason": "4-6 sentences directly about what the player specifically did and its exact consequence",
   "stateChanges": {},
   "resourceChanges": [],
   "objectiveProgress": {},
-  "nextEvent": "One sentence teaser for what comes next (or epitaph if dead)",
+  "nextEvent": "One sentence — triumphant teaser if survived, haunting epitaph if dead",
   "continueGame": false
 }
 
-CRITICAL: continueGame is ALWAYS false. Every action ends the scenario.
-- Smart, realistic action → survival (outcome: success or critical_success)
-- Vague, dangerous, impossible, or stupid action → death (outcome: critical_failure)`;
+CRITICAL: continueGame is ALWAYS false. Every action ends the scenario.`;
   }
 
   private buildSurvivalUserPrompt(
@@ -224,11 +226,15 @@ CRITICAL: continueGame is ALWAYS false. Every action ends the scenario.
     const scenarioIndex = (session as any).scenarioIndex ?? 0;
     const totalScenarios = 5;
 
-    return `SCENARIO ${scenarioIndex + 1}/${totalScenarios} — one action, final verdict.
+    return `SCENARIO ${scenarioIndex + 1}/${totalScenarios} — render a final verdict on this exact action.
 
-Player's action: "${playerAction}"
+THE PLAYER TYPED THIS EXACT ACTION: "${playerAction}"
 
-Does this action save them or kill them? Respond with vivid cinematic JSON only.`;
+Your entire narration MUST be about what they specifically did. Do not invent actions they didn't take. Do not narrate something generic. Make the reason field read like a movie scene where "${playerAction}" is literally the thing that happens.
+
+If it's creative or whacky, COMMIT to it with humour and flair — reward the creativity if it could plausibly work in this environment. If it truly cannot work, describe the exact consequence of that specific mistake.
+
+Respond with JSON only.`;
   }
 
   private sanitizeAIResponse(raw: any): AISurvivalResponse {
