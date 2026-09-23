@@ -16,6 +16,7 @@ import leaderboardRoutes from './routes/leaderboard';
 
 // Import socket handlers
 import { setupSocketHandlers } from './sockets';
+import { getGroqKeyCount } from './utils/aiQueue';
 
 // Import Supabase setup
 import { testSupabaseConnection } from './database/supabase';
@@ -112,7 +113,8 @@ app.get('/health', (req, res) => {
     status: 'OK', 
     environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString(),
-    database: 'supabase'
+    database: 'supabase',
+    aiKeys: getGroqKeyCount(),
   });
 });
 
