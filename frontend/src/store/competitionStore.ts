@@ -12,14 +12,12 @@ import { persist } from 'zustand/middleware';
 export type CompetitionPhase =
   | 'round1_img1'
   | 'round1_img2'
-  | 'round1_img3'
   | 'qualifying'
   | 'round2'
   | 'final';
 
 export const CHALLENGE_1_ID = '00000000-0000-0000-0000-000000000001';
 export const CHALLENGE_2_ID = '00000000-0000-0000-0000-000000000002';
-export const CHALLENGE_3_ID = '00000000-0000-0000-0000-000000000003';
 export const SCENARIO_ID    = '00000000-0000-0000-0000-000000000001'; // Desert Survival
 
 /** How many players advance to Round 2 */

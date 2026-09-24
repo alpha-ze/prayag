@@ -1,10 +1,12 @@
 /**
  * Round 1 — Promptle wrapper
  *
- * Handles all 3 images:
- *   - phase === 'round1_img1' → Challenge 1 (Space Explorer)
- *   - phase === 'round1_img2' → Challenge 2 (Ocean Deep)
- *   - phase === 'round1_img3' → Challenge 3 (Dark Castle)
+ * Handles both images transparently:
+ *   - phase === 'round1_img1' → starts Challenge 1 (Space Explorer)
+ *   - phase === 'round1_img2' → starts Challenge 2 (Ocean Deep)
+ *
+ * On completion of each image the player is routed to the next phase.
+ * The select screen is bypassed entirely.
  */
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useGameStore, getSavedPromptelSession, clearPromptelSession } from '@/store/gameStore';
 import {
-  useCompetitionStore, CHALLENGE_1_ID, CHALLENGE_2_ID, CHALLENGE_3_ID, CompetitionPhase,
+  useCompetitionStore, CHALLENGE_1_ID, CHALLENGE_2_ID, CompetitionPhase,
 } from '@/store/competitionStore';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -32,21 +34,13 @@ const CHALLENGE_META: Record<string, { title: string; imageUrl: string; imageNum
     imageUrl: '/images/ocean-deep.png',
     imageNum: 2,
   },
-  [CHALLENGE_3_ID]: {
-    title: 'Image 3 — Dark Castle',
-    imageUrl: '/images/dark-castle.png',
-    imageNum: 3,
-  },
 };
 
 const Round1Game: React.FC = () => {
   const navigate = useNavigate();
   const { phase, advancePhase, setRound1Score, round1Score } = useCompetitionStore();
 
-  const challengeId =
-    phase === 'round1_img1' ? CHALLENGE_1_ID :
-    phase === 'round1_img2' ? CHALLENGE_2_ID :
-    CHALLENGE_3_ID;
+  const challengeId = phase === 'round1_img1' ? CHALLENGE_1_ID : CHALLENGE_2_ID;
   const meta = CHALLENGE_META[challengeId];
 
   const {
@@ -109,21 +103,15 @@ const Round1Game: React.FC = () => {
     setGameComplete(true);
 
     if (nextPhase === 'round1_img2') {
+      // Show a brief "Great! Next image…" overlay, then navigate
       setShowTransition(true);
       setTimeout(() => {
         resetPromptelSession();
         advancePhase('round1_img2');
         setShowTransition(false);
       }, 3000);
-    } else if (nextPhase === 'round1_img3') {
-      setShowTransition(true);
-      setTimeout(() => {
-        resetPromptelSession();
-        advancePhase('round1_img3');
-        setShowTransition(false);
-      }, 3000);
     } else {
-      // All images done → qualifying
+      // All images done → go to qualifying screen
       setTimeout(() => {
         resetPromptelSession();
         advancePhase('qualifying');
@@ -156,9 +144,7 @@ const Round1Game: React.FC = () => {
       if (result.isGameComplete) {
         const finalScore = currentPromptelSession.score ?? 0;
         const nextPhase: CompetitionPhase =
-          phase === 'round1_img1' ? 'round1_img2' :
-          phase === 'round1_img2' ? 'round1_img3' :
-          'qualifying';
+          phase === 'round1_img1' ? 'round1_img2' : 'qualifying';
         finishAndAdvance(nextPhase, finalScore);
       }
     } catch {
@@ -181,9 +167,7 @@ const Round1Game: React.FC = () => {
     clearPromptelSession();
     const score = currentPromptelSession?.score ?? 0;
     const nextPhase: CompetitionPhase =
-      phase === 'round1_img1' ? 'round1_img2' :
-      phase === 'round1_img2' ? 'round1_img3' :
-      'qualifying';
+      phase === 'round1_img1' ? 'round1_img2' : 'qualifying';
     finishAndAdvance(nextPhase, score);
   };
 
@@ -219,7 +203,7 @@ const Round1Game: React.FC = () => {
             >
               <Star className="w-16 h-16 text-neon-green mx-auto mb-4" />
               <h2 className="text-4xl font-bold font-cyber text-neon-green mb-3">
-                Image {meta.imageNum} Complete!
+                Image 1 Complete!
               </h2>
               <p className="text-gray-300 text-xl mb-2">Score: {currentPromptelSession?.score ?? 0} pts</p>
               <p className="text-gray-500 mt-4 animate-pulse">Loading Image 2…</p>
@@ -237,15 +221,13 @@ const Round1Game: React.FC = () => {
           <h1 className="text-3xl font-bold font-cyber bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent mb-1">
             {meta.title}
           </h1>
-          {/* Progress pills — 3 images */}
+          {/* Progress pills */}
           <div className="flex items-center justify-center gap-2 mt-2">
-            {[1, 2, 3].map((n) => (
+            {[1, 2].map((n) => (
               <div
                 key={n}
                 className={`h-2 w-12 rounded-full transition-all ${
-                  (phase === 'round1_img1' && n === 1) ||
-                  (phase === 'round1_img2' && n <= 2) ||
-                  (phase === 'round1_img3' && n <= 3)
+                  (phase === 'round1_img1' && n === 1) || (phase === 'round1_img2' && n <= 2)
                     ? 'bg-neon-blue'
                     : 'bg-gray-700'
                 }`}

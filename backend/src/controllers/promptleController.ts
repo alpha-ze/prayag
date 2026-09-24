@@ -64,11 +64,6 @@ const CHALLENGE_HINTS: Record<string, string[]> = {
     '💡 Consider the colourful living structures built by tiny organisms on the sea floor',
     '💡 Think about the most feared predator lurking in deep water',
   ],
-  '00000000-0000-0000-0000-000000000003': [
-    '💡 Think about a large medieval stone structure with towers where royalty lived',
-    '💡 Consider a portable light source carried by hand, often with a flame inside glass',
-    '💡 Think about what a bolt of electricity from the sky during a storm is called',
-  ],
 };
 const CHALLENGE_KEYWORDS: Record<string, Array<{ keyword: string; aliases: string[]; is_required: boolean; points: number }>> = {
   '00000000-0000-0000-0000-000000000001': [
@@ -84,13 +79,6 @@ const CHALLENGE_KEYWORDS: Record<string, Array<{ keyword: string; aliases: strin
     { keyword: 'coral',   aliases: ['reef', 'coral reef'],    is_required: true,  points: 100 },
     { keyword: 'wave',    aliases: ['waves', 'surf'],         is_required: false, points: 100 },
     { keyword: 'shark',   aliases: ['whale', 'dolphin'],      is_required: false, points: 100 },
-  ],
-  '00000000-0000-0000-0000-000000000003': [
-    { keyword: 'castle',  aliases: ['fortress', 'palace'],    is_required: true,  points: 100 },
-    { keyword: 'lantern', aliases: ['lamp', 'light'],         is_required: true,  points: 100 },
-    { keyword: 'forest',  aliases: ['trees', 'woods'],        is_required: true,  points: 100 },
-    { keyword: 'clock',   aliases: ['time', 'watch'],         is_required: false, points: 100 },
-    { keyword: 'storm',   aliases: ['lightning', 'thunder'],  is_required: false, points: 100 },
   ],
 };
 
@@ -452,18 +440,6 @@ function getStaticChallenges() {
       imageUrl: 'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=800&h=800&fit=crop',
       difficulty: 'medium',
       category: 'Nature',
-      maxGuesses: 8,
-      timeLimit: 300,
-      isActive: true,
-      keywordCount: 5,
-    },
-    {
-      id: '00000000-0000-0000-0000-000000000003',
-      title: 'Dark Castle',
-      description: 'Find the hidden keywords in this mysterious dark fantasy scene.',
-      imageUrl: '/images/dark-castle.png',
-      difficulty: 'medium',
-      category: 'Fantasy',
       maxGuesses: 8,
       timeLimit: 300,
       isActive: true,
