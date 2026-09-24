@@ -207,9 +207,16 @@ const FinalLeaderboard: React.FC = () => {
                         <span className="ml-2 text-xs font-mono text-gray-600 bg-dark-400 px-1.5 py-0.5 rounded">{shortId(entry.userId)}</span>
                         {isMe && <span className="text-xs ml-1 text-neon-blue">(you)</span>}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        R1: {(entry.roundScores as any)?.promptle ?? 0} · R2: {(entry.roundScores as any)?.survival ?? 0}
-                      </p>
+                      <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                        <p className="text-xs text-gray-500">
+                          R1: {(entry.roundScores as any)?.promptle ?? 0} · R2: {(entry.roundScores as any)?.survival ?? 0}
+                        </p>
+                        {entry.lastActivity && (
+                          <p className="text-xs text-gray-600">
+                            {new Date(entry.lastActivity).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <div className="text-right mr-3">
                       <motion.p

@@ -154,7 +154,14 @@ const LiveLeaderboard: React.FC = () => {
                   }`}>
                     {entry.username.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-2xl font-bold text-white">{entry.username}</span>
+                  <div>
+                    <span className="text-2xl font-bold text-white block">{entry.username}</span>
+                    {entry.lastActivity && (
+                      <span className="text-sm text-gray-500">
+                        {new Date(entry.lastActivity).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* R1 score */}

@@ -242,13 +242,20 @@ const Leaderboard: React.FC = () => {
                                   {entry.username}
                                   <span className="ml-2 text-xs font-mono text-gray-600 bg-dark-400 px-1.5 py-0.5 rounded">{shortId(entry.userId)}</span>
                                 </p>
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-0.5 ${
-                                  entry.status === 'active'    ? 'bg-green-500/20 text-green-400' :
-                                  entry.status === 'completed' ? 'bg-blue-500/20  text-blue-400'  :
-                                  'bg-red-500/20 text-red-400'
-                                }`}>
-                                  {entry.status.toUpperCase()}
-                                </span>
+                                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                    entry.status === 'active'    ? 'bg-green-500/20 text-green-400' :
+                                    entry.status === 'completed' ? 'bg-blue-500/20  text-blue-400'  :
+                                    'bg-red-500/20 text-red-400'
+                                  }`}>
+                                    {entry.status.toUpperCase()}
+                                  </span>
+                                  {entry.lastActivity && (
+                                    <span className="text-xs text-gray-500">
+                                      {new Date(entry.lastActivity).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
