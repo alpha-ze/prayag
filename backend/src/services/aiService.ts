@@ -113,62 +113,71 @@ export class AIService {
     ];
 
     if (provider === 'groq') {
-      // Get ONE key for this request (don't call getNextGroqKey twice)
-      const key = getNextGroqKey();
-      console.log(`🔑 Using Groq key: ${key.substring(0, 15)}...`);
+      // Try each key until one works
+      const totalKeys = getGroqKeyCount();
+      let lastError: Error | null = null;
 
-      return new Promise((resolve, reject) => {
-        const https = require('https');
-        const payload = JSON.stringify({
-          model,
-          messages,
-          max_tokens: 800,
-          temperature: 0.9,
-        });
+      for (let attempt = 0; attempt < Math.min(totalKeys, 4); attempt++) {
+        const key = getNextGroqKey();
+        console.log(`🔑 Using Groq key: ${key.substring(0, 15)}... (attempt ${attempt + 1}/${totalKeys})`);
 
-        const options = {
-          hostname: 'api.groq.com',
-          path: '/openai/v1/chat/completions',
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${key}`,
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(payload),
-          },
-          timeout: 35000,
-        };
+        try {
+          const result = await new Promise<any>((resolve, reject) => {
+            const https = require('https');
+            const payload = JSON.stringify({ model, messages, max_tokens: 800, temperature: 0.9 });
+            const options = {
+              hostname: 'api.groq.com',
+              path: '/openai/v1/chat/completions',
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${key}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(payload),
+              },
+              timeout: 35000,
+            };
 
-        const req = https.request(options, (res: any) => {
-          let data = '';
-          res.on('data', (chunk: any) => { data += chunk; });
-          res.on('end', () => {
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.error) {
-                console.error('Groq API error:', JSON.stringify(parsed.error));
-                reject(new Error(`Groq error: ${JSON.stringify(parsed.error)}`));
-              } else {
-                resolve(parsed);
-              }
-            } catch (e) {
-              reject(new Error(`Failed to parse Groq response: ${data.substring(0, 300)}`));
-            }
+            const req = https.request(options, (res: any) => {
+              let data = '';
+              res.on('data', (chunk: any) => { data += chunk; });
+              res.on('end', () => {
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.error) {
+                    // If it's an auth error, try next key
+                    if (parsed.error.code === 'invalid_api_key') {
+                      console.warn(`⚠️ Key ${key.substring(0, 15)}... is invalid, trying next key`);
+                      reject(new Error(`INVALID_KEY:${parsed.error.message}`));
+                    } else {
+                      reject(new Error(`Groq error: ${JSON.stringify(parsed.error)}`));
+                    }
+                  } else {
+                    resolve(parsed);
+                  }
+                } catch (e) {
+                  reject(new Error(`Failed to parse Groq response: ${data.substring(0, 300)}`));
+                }
+              });
+            });
+
+            req.on('timeout', () => { req.destroy(); reject(new Error('Groq request timed out after 35s')); });
+            req.on('error', (err: any) => reject(err));
+            req.write(payload);
+            req.end();
           });
-        });
 
-        req.on('timeout', () => {
-          req.destroy();
-          reject(new Error('Groq request timed out after 35s'));
-        });
+          return result; // success — return immediately
+        } catch (err: any) {
+          lastError = err;
+          // Only retry on invalid key errors, not on other errors
+          if (!err.message?.startsWith('INVALID_KEY:')) {
+            throw err;
+          }
+          console.warn(`Skipping invalid key, trying next...`);
+        }
+      }
 
-        req.on('error', (err: any) => {
-          console.error('Groq request error:', err.message);
-          reject(err);
-        });
-
-        req.write(payload);
-        req.end();
-      });
+      throw lastError || new Error('All Groq keys failed');
     }
 
     // OpenAI fallback
